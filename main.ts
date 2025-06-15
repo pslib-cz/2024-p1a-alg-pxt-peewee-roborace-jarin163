@@ -1,22 +1,26 @@
-
 radio.setGroup(23)
 
 let trim = 0
-let canDrive = true
-let autoPilot = 0
+let mode = "manual"
 
 basic.forever(function () {
-    let x = input.acceleration(Dimension.X); //left,right
-    let y = input.acceleration(Dimension.Y); //forward,backwards
-    radio.sendString(`${x},${y}`)
-    basic.pause(50);
+    if (mode == "manual") {
+        let x = input.acceleration(Dimension.X)
+        let y = input.acceleration(Dimension.Y)
+        radio.sendString(`${x},${y}`)
+    }
+    basic.pause(50)
 })
 
 input.onButtonPressed(Button.AB, function () {
-    canDrive = !canDrive
-    radio.sendValue("drive", canDrive ? 1 : 0)
+    if (mode == "manual") {
+        mode = "auto"
+        radio.sendValue("mode", 1)
+    } else {
+        mode = "manual"
+        radio.sendValue("mode", 0)
+    }
 })
-
 
 input.onButtonPressed(Button.A, function () {
     trim -= 5
@@ -34,10 +38,4 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     trim = 0
     radio.sendValue("trim", trim)
     basic.showNumber(trim)
-})
-
-pins.touchSetMode(TouchTarget.P1, TouchTargetMode.Capacitive)
-input.onPinPressed(TouchPin.P1, function () {
-    autoPilot = 1
-    radio.sendValue("autopilot", autoPilot)
 })
